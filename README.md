@@ -1,6 +1,4 @@
-associate_training
-==============================
-
+# Use the following file to run the project as a docker container
 # HOW TO RUN
 ---
 
