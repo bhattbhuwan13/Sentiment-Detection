@@ -6,7 +6,7 @@ import time
 import json
 print(os.path.realpath(__file__))
 
-full_absolute_location = os.path.realpath(__file__) 
+full_absolute_location = os.path.realpath(__file__)
 full_absolute_location = full_absolute_location.split("/")
 full_absolute_location = "/".join( full_absolute_location[:-2])
 sys.path.append(os.path.join(full_absolute_location, 'src'))
@@ -28,8 +28,8 @@ app = Flask(__name__, template_folder="./templates")
 #MONGO_URL = "mongodb://127.0.0.1:27017"
 #MONGO_URL = 'mongodb://' + str(host.docker.internal) + ':27017'
 IP_ADDR = '192.168.1.67'
-MONGO_URL = 'mongodb://' + IP_ADDR + ':27017'
-print("Ip address for mongo is {}".format(MONGO_URL))
+MONGO_URL = f'mongodb://{IP_ADDR}:27017'
+print(f"Ip address for mongo is {MONGO_URL}")
 
 
 @app.route('/')
@@ -68,58 +68,59 @@ def find_sentiment():
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment():
-    if request.method == 'POST':
-        # Form being submitted; grab data from form.
-        text = request.args.get("text", '')
-        a = time.monotonic()
-        print("printing the text {}".format(request.get_json(force=True)['text']))
-        text = request.get_json(force=True)['text']
-        sentiment, probability = make_predictions(text)
-        sentiment = sentiment[0]
-        b = time.monotonic()
-        time_elapsed = b-a
-        
-        response = {
-                    'sentiment':sentiment,
-                    'eta' : time_elapsed,
-                    'confidence': probability
-                }
-        response = jsonify(response)
+    if request.method != 'POST':
+        return
+    # Form being submitted; grab data from form.
+    text = request.args.get("text", '')
+    a = time.monotonic()
+    print(f"printing the text {request.get_json(force=True)['text']}")
+    text = request.get_json(force=True)['text']
+    sentiment, probability = make_predictions(text)
+    sentiment = sentiment[0]
+    b = time.monotonic()
+    time_elapsed = b-a
 
-        database_item = {
-                    'query':text,
-                    'sentiment':sentiment,
-                    'eta' : time_elapsed,
-                    'confidence': probability
-                    }
-        # inserting to dtabase
-        #client = MongoClient(MONGO_URL)
-        client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
-        db=client['sentiments']
-        sentiments = db.sentiments
-        sentiments.insert_one(database_item)
-        return response
+    response = {
+                'sentiment':sentiment,
+                'eta' : time_elapsed,
+                'confidence': probability
+            }
+    response = jsonify(response)
+
+    database_item = {
+                'query':text,
+                'sentiment':sentiment,
+                'eta' : time_elapsed,
+                'confidence': probability
+                }
+    # inserting to dtabase
+    #client = MongoClient(MONGO_URL)
+    client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
+    db=client['sentiments']
+    sentiments = db.sentiments
+    sentiments.insert_one(database_item)
+    return response
 
 
 @app.route('/get_all_items', methods=['GET'])
 def get_all_items():
-    if request.method == 'GET':
-        # Form being submitted; grab data from form.
+    if request.method != 'GET':
+        return
+    # Form being submitted; grab data from form.
 
-        # getting all request from database
-        #client = MongoClient(MONGO_URL)
-        client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
-        db=client['sentiments']
-        sentiments = db.sentiments
-        
-        items = []
-        for item in sentiments.find():
-            item.pop('_id')
-            items.append(item)
+    # getting all request from database
+    #client = MongoClient(MONGO_URL)
+    client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
+    db=client['sentiments']
+    sentiments = db.sentiments
+
+    items = []
+    for item in sentiments.find():
+        item.pop('_id')
+        items.append(item)
 
 
-        resp = jsonify(items)
-        return resp
+    return jsonify(items)
 
 
 if __name__ == '__main__':
