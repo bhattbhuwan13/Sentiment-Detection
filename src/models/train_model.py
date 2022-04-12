@@ -21,13 +21,13 @@ from sklearn.linear_model import SGDClassifier
 
 def save_model(model, location='../../models/', name='SGD'):
     current_date = str(date.today())
-    current_time = datetime.today().strftime("%H:%M:%S")
+    current_time = datetime.now().strftime("%H:%M:%S")
 
     complete_location = location + name + '_' + current_date + '_' + current_time + '.pkl'
     try:
         with open(complete_location, 'wb') as file:
             pickle.dump(model, file)
-        print("Model {} successfully saved at {}".format(model, location))
+        print(f"Model {model} successfully saved at {location}")
 
     except:
         print("Model saving failed")
@@ -42,11 +42,11 @@ def train_model(dataset_location):
 
     y_train_pred = classifier.predict(X_train)
     train_accuracy = accuracy_score(y_train, y_train_pred)
-    print("The accuracy of training set is {}%".format(train_accuracy* 100))
+    print(f"The accuracy of training set is {train_accuracy * 100}%")
 
     y_test_pred = classifier.predict(X_test)
     prediction_accuracy = accuracy_score(y_test_pred, y_test)
-    print("The accuracy of prediction set is {}%".format(prediction_accuracy* 100))
+    print(f"The accuracy of prediction set is {prediction_accuracy * 100}%")
 
     return classifier
 
@@ -56,16 +56,16 @@ def main():
 
 
     dataset_and_model_location = os.sys.path[0]
-    print("dataset and moedel location = {}".format(dataset_and_model_location))
+    print(f"dataset and moedel location = {dataset_and_model_location}")
     dataset_and_model_location = dataset_and_model_location.split("/")
     dataset_and_model_location = "/".join(dataset_and_model_location[:-2])
-    print("dataset and moedel location = {}".format(dataset_and_model_location))
+    print(f"dataset and moedel location = {dataset_and_model_location}")
 
-    FILE_LOCATION = dataset_and_model_location + '/data/raw/ISEAR.csv'
-    MODEL_LOCATION = dataset_and_model_location + '/models/'
+    FILE_LOCATION = f'{dataset_and_model_location}/data/raw/ISEAR.csv'
+    MODEL_LOCATION = f'{dataset_and_model_location}/models/'
 
     NAME = 'SGD'
-   
+
     print(FILE_LOCATION, MODEL_LOCATION)
     # Initiate the parser
     parser = argparse.ArgumentParser()
@@ -78,18 +78,24 @@ def main():
     args = parser.parse_args()
 
     if args.model_location:
-        MODEL_LOCATION = os.path.abspath(args.model_location) 
-        print("model will be stored at {}".format(MODEL_LOCATION))
+        MODEL_LOCATION = os.path.abspath(args.model_location)
+        print(f"model will be stored at {MODEL_LOCATION}")
     else:
-        MODEL_LOCATION = os.path.abspath(MODEL_LOCATION) 
-        print("Explicit model location not supplied, model will be stored at defaut location - {}".format(MODEL_LOCATION))
+        MODEL_LOCATION = os.path.abspath(MODEL_LOCATION)
+        print(
+            f"Explicit model location not supplied, model will be stored at defaut location - {MODEL_LOCATION}"
+        )
+
 
     if args.dataset_location:
-        FILE_LOCATION = os.path.abspath(args.dataset_location) 
-        print("Dataset will be stored at {}".format(FILE_LOCATION))
+        FILE_LOCATION = os.path.abspath(args.dataset_location)
+        print(f"Dataset will be stored at {FILE_LOCATION}")
     else:
-        FILE_LOCATION = os.path.abspath(FILE_LOCATION) 
-        print("Explicit dataset path not supplied, reading dataset from the default location - {}".format(FILE_LOCATION))
+        FILE_LOCATION = os.path.abspath(FILE_LOCATION)
+        print(
+            f"Explicit dataset path not supplied, reading dataset from the default location - {FILE_LOCATION}"
+        )
+
 
 
 

@@ -18,19 +18,18 @@ def get_features(file_location):
     path_to_base_folder = os.sys.path[0]
     path_to_base_folder = path_to_base_folder.split("/")
     path_to_base_folder = ("/").join(path_to_base_folder[:-2])
-    print("path to base folder is {}".format(path_to_base_folder))
+    print(f"path to base folder is {path_to_base_folder}")
     # Reading the pickle files
     vectorizer_file = open(path_to_base_folder + '/models/encoder_and_vectorizer/vectorizer.pkl', 'rb')
-    label_encoder_file = open(path_to_base_folder + '/models/encoder_and_vectorizer/label_encoder.pkl', 'rb')
-    tf_idf_transformer_file = open(path_to_base_folder + '/models/encoder_and_vectorizer/tf_idf_transformer.pkl', 'rb')
+    with open(path_to_base_folder + '/models/encoder_and_vectorizer/label_encoder.pkl', 'rb') as label_encoder_file:
+        tf_idf_transformer_file = open(path_to_base_folder + '/models/encoder_and_vectorizer/tf_idf_transformer.pkl', 'rb')
 
-    vectorizer = pickle.load(vectorizer_file)
-    label_encoder = pickle.load(label_encoder_file)
-    tf_idf_transformer = pickle.load(tf_idf_transformer_file)
-    
-    # Closing the files
-    vectorizer_file.close()
-    label_encoder_file.close()
+        vectorizer = pickle.load(vectorizer_file)
+        label_encoder = pickle.load(label_encoder_file)
+        tf_idf_transformer = pickle.load(tf_idf_transformer_file)
+
+        # Closing the files
+        vectorizer_file.close()
     tf_idf_transformer_file.close()
 
 
@@ -39,9 +38,9 @@ def get_features(file_location):
     )
 
     features = tf_idf_transformer.transform(features)
-    
+
     features_nd = features.toarray()
-    
+
     raw_data['sentiment_encoded'] = label_encoder.transform(raw_data['sentiment'])
 
     X, y = features_nd, raw_data['sentiment_encoded']
